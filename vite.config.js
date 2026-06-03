@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename)
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(), // v4: Vite-native plugin, replaces PostCSS setup
+    tailwindcss(),
   ],
 
   resolve: {
@@ -29,10 +29,19 @@ export default defineConfig({
     sourcemap: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-          'react-vendor':  ['react', 'react-dom', 'react-router-dom'],
-          'chart-vendor':  ['recharts'],
+        manualChunks(id) {
+          if (id.includes('three') || id.includes('@react-three/fiber') || id.includes('@react-three/drei')) {
+            return 'three-vendor'
+          }
+          if (id.includes('react-dom') || id.includes('react-router-dom')) {
+            return 'react-vendor'
+          }
+          if (id.includes('react')) {
+            return 'react-vendor'
+          }
+          if (id.includes('recharts')) {
+            return 'chart-vendor'
+          }
         },
       },
     },
