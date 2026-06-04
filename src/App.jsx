@@ -1,5 +1,7 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 // ── Layouts ───────────────────────────────────────────────────────────────
 import AdminLayout    from "@/components/layout/AdminLayout";
@@ -7,9 +9,11 @@ import CustomerLayout from "@/components/layout/CustomerLayout";
 import PublicLayout   from "@/components/layout/PublicLayout";
 
 // ── Public Pages ──────────────────────────────────────────────────────────
-import LandingPage  from "@/pages/public/LandingPage";
-import LoginPage    from "@/pages/public/LoginPage";
-import RegisterPage from "@/pages/public/RegisterPage";
+import LandingPage        from "@/pages/public/LandingPage";
+import LoginPage          from "@/pages/public/LoginPage";
+import RegisterPage       from "@/pages/public/RegisterPage";
+import ForgotPasswordPage from "@/pages/public/ForgotPasswordPage";
+import ResetPasswordPage  from "@/pages/public/ResetPasswordPage";
 
 // ── Customer Pages ────────────────────────────────────────────────────────
 import CatalogPage          from "@/pages/customer/CatalogPage";
@@ -87,10 +91,33 @@ function GuestRoute({ children }) {
   return children;
 }
 
-// ── App — no useEffect, no session logic here ─────────────────────────────
+// ── Password Recovery Listener ────────────────────────────────────────────
+// Listens for Supabase PASSWORD_RECOVERY event (fired when user clicks
+// the reset link in their email) and redirects to /reset-password.
+function PasswordRecoveryHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          navigate("/reset-password", { replace: true });
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  return null;
+}
+
+// ── App ───────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <BrowserRouter>
+      {/* Listens globally for PASSWORD_RECOVERY across all routes */}
+      <PasswordRecoveryHandler />
+
       <Routes>
         {/* ── Public Routes ─────────────────────────────── */}
         <Route element={<PublicLayout />}>
@@ -101,6 +128,9 @@ export default function App() {
           <Route path="register"
             element={<GuestRoute><RegisterPage /></GuestRoute>}
           />
+          {/* Password reset flow — accessible without auth */}
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password"  element={<ResetPasswordPage />} />
         </Route>
 
         {/* ── Customer Routes ───────────────────────────── */}

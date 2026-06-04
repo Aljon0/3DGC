@@ -5,8 +5,6 @@ import { Eye, EyeOff, Layers, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-// ── Demo credentials hint ──────────────────────────────────────────────────
-
 /**
  * LoginPage
  * Email + password login form.
@@ -15,7 +13,7 @@ import { Link } from "react-router-dom";
 export default function LoginPage() {
   const { login, isLoading, error, clearError } = useAuth();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -72,7 +70,7 @@ export default function LoginPage() {
           {error && (
             <div
               className="mb-5 px-4 py-3 rounded-xl bg-red-500/10
-                            border border-red-500/20 text-sm text-red-400 font-sans"
+                              border border-red-500/20 text-sm text-red-400 font-sans"
             >
               {error}
             </div>
@@ -96,34 +94,46 @@ export default function LoginPage() {
             />
 
             {/* Password */}
-            <Input
-              label="Password"
-              type={showPass ? "text" : "password"}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setFormErrors((f) => ({ ...f, password: null }));
-              }}
-              placeholder="Enter your password"
-              iconLeft={<Lock className="size-4" />}
-              iconRight={
-                <button
-                  type="button"
-                  onClick={() => setShowPass((v) => !v)}
-                  className="text-brand-500 hover:text-brand-200 transition-colors"
-                  tabIndex={-1}
+            <div className="space-y-1">
+              <Input
+                label="Password"
+                type={showPass ? "text" : "password"}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setFormErrors((f) => ({ ...f, password: null }));
+                }}
+                placeholder="Enter your password"
+                iconLeft={<Lock className="size-4" />}
+                iconRight={
+                  <button
+                    type="button"
+                    onClick={() => setShowPass((v) => !v)}
+                    className="text-brand-500 hover:text-brand-200 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPass ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                }
+                error={formErrors.password}
+                autoComplete="current-password"
+                required
+              />
+              {/* Forgot password link — sits right under the password field */}
+              <div className="flex justify-end pt-0.5">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-brand-500 hover:text-accent-400
+                             transition-colors duration-150 font-sans"
                 >
-                  {showPass ? (
-                    <EyeOff className="size-4" />
-                  ) : (
-                    <Eye className="size-4" />
-                  )}
-                </button>
-              }
-              error={formErrors.password}
-              autoComplete="current-password"
-              required
-            />
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
 
             {/* Submit */}
             <Button
