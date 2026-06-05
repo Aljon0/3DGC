@@ -28,24 +28,42 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     let cancelled = false;
 
+    // Read token from query string (?access_token=...&type=recovery)
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("access_token");
+    const type = params.get("type");
+
+    if (accessToken && type === "recovery") {
+      // Manually set the session so Supabase knows who is resetting
+      supabase.auth
+        .setSession({
+          access_token: accessToken,
+          refresh_token: params.get("refresh_token") ?? "",
+        })
+        .then(({ error }) => {
+          if (!error) {
+            cancelled = true;
+            setReady(true);
+          }
+        });
+    }
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
-        cancelled = true; // ← stop the timer from firing
+        cancelled = true;
         setReady(true);
       }
     });
 
-    // If no event fires within 3s, assume link is invalid/expired
     const timer = setTimeout(() => {
       if (!cancelled) setInvalid(true);
     }, 8000);
 
-    // If already has a session with recovery, mark ready immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        cancelled = true; // ← stop the timer from firing
+        cancelled = true;
         clearTimeout(timer);
         setReady(true);
       }
