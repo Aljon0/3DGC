@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
@@ -114,7 +114,7 @@ function PasswordRecoveryHandler() {
 // ── App ───────────────────────────────────────────────────────────────────
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       {/* Listens globally for PASSWORD_RECOVERY across all routes */}
       <PasswordRecoveryHandler />
 
@@ -176,6 +176,6 @@ export default function App() {
         {/* ── Catch-all ─────────────────────────────────── */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

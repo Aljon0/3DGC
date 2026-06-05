@@ -28,13 +28,12 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     let cancelled = false;
 
-    // Read token from query string (?access_token=...&type=recovery)
+    // With HashRouter, query string is in window.location.search
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get("access_token");
     const type = params.get("type");
 
     if (accessToken && type === "recovery") {
-      // Manually set the session so Supabase knows who is resetting
       supabase.auth
         .setSession({
           access_token: accessToken,
