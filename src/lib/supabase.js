@@ -18,7 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnon, {
   auth: {
     persistSession:     true,   // Saves session to localStorage automatically
     autoRefreshToken:   true,   // Refreshes JWT before it expires
-    detectSessionInUrl: false,  // Not using OAuth redirects
+    detectSessionInUrl: true,  // Not using OAuth redirects
   },
   realtime: {
     params: {

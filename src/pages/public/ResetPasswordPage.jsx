@@ -40,7 +40,7 @@ export default function ResetPasswordPage() {
     // If no event fires within 3s, assume link is invalid/expired
     const timer = setTimeout(() => {
       if (!cancelled) setInvalid(true);
-    }, 3000);
+    }, 8000);
 
     // If already has a session with recovery, mark ready immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
