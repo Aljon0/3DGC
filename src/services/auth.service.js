@@ -104,21 +104,21 @@ const authService = {
     const { data: { session } } = await supabase.auth.getSession();
   
     if (!session) {
-      useAuthStore.getState().logout();
+      // Don't logout if user is on the reset-password page
+      // They arrive without a session — the token is in the URL
+      const isResettingPassword = window.location.hash.includes('reset-password');
+      if (!isResettingPassword) {
+        useAuthStore.getState().logout();
+      }
       return null;
     }
   
-    // Attach token to all future api calls
     api.defaults.headers.common['Authorization'] =
       `Bearer ${session.access_token}`;
   
     try {
-      // Only fetch profile — do NOT call /users/sync here
-      // Sync only needs to run once after registration/login
-      // Calling it on every refresh was resetting the role
       const response = await api.get('/users/me');
       const profile  = response.data.profile;
-  
       useAuthStore.getState().setAuth(profile, session.access_token);
       return profile;
     } catch (err) {

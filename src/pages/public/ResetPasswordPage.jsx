@@ -100,11 +100,11 @@ export default function ResetPasswordPage() {
       setGlobalError(error.message);
     } else {
       setDone(true);
-      // Auto-redirect to login after 3s
+      // Sign out the recovery session before redirecting to login
+      await supabase.auth.signOut();
       setTimeout(() => navigate("/login", { replace: true }), 3000);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16">
       {/* Background accent */}
